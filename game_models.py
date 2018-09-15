@@ -10,12 +10,14 @@ in this game"""
 
 
 class Player:
+    player_name = None
 
     def move(self):
         """
          This function make the player choose the next move
         :return: The next move it's one of ['rock', 'paper', 'scissors']
         """
+        print(f"{self.player_name} moved")
         return 'rock'
 
     def learn(self, my_move, their_move):
@@ -27,15 +29,20 @@ class Player:
         """
         pass
 
+    def set_player_name(self, name):
+        self.player_name = name
+
 
 class RandomPlayer(Player):
-    @classmethod
-    def move(cls):
+
+    def move(self):
         """
          This function make the RandomPlayer choose the next move randomly
         :return: The next move it's one of ['rock', 'paper', 'scissors']
         """
-        return random.choice(moves)
+        next_move = random.choice(moves)
+        print(f"{self.player_name} moved")
+        return next_move
 
     def learn(self, my_move, their_move):
         """
@@ -46,20 +53,26 @@ class RandomPlayer(Player):
         """
         pass
 
+    def set_player_name(self, name):
+        self.player_name = name
+
 
 class ReflectPlayer(Player):
     next_move = random.choice(moves)
 
     def move(self):
         """
-        This function make the ReflectPlayer choose the next move base on the move of the another player at the last
+        This function make the ReflectPlayer choose the next move base \
+        on the move of the another player at the last
         round :return: The next move it's one of ['rock', 'paper', 'scissors']
         """
+        print(f"{self.player_name} moved")
         return self.next_move
 
     def learn(self, my_move, their_move):
         """
-         This function make the player know what's the another player move and save it to be the next move
+         This function make the player know what's the another player \
+         move and save it to be the next move
         :param my_move: The player move
         :param their_move: The another player move
         :return:
@@ -70,20 +83,23 @@ class ReflectPlayer(Player):
 class CyclePlayer(Player):
     index_of_current_move = 0
 
-    @classmethod
-    def move(cls):
+    def move(self):
         """
-        This function make the CyclePlayer choose the next move, the chooses will be 'rock', 'paper', 'scissors',
+        This function make the CyclePlayer choose the next move, \
+        the chooses will be 'rock', 'paper', 'scissors',
         ' rock' ,'paper' ...etc
         :return: The next move it's one of ['rock', 'paper', 'scissors']
         """
-        next_move = moves[cls.index_of_current_move]
-        cls.index_of_current_move = (cls.index_of_current_move + 1) % len(moves)
+        next_move = moves[self.index_of_current_move]
+        self.index_of_current_move = \
+            (self.index_of_current_move + 1) % len(moves)
+        print(f"{self.player_name} moved")
         return next_move
 
     def learn(self, my_move, their_move):
         """
-         This function make the player know what's the another player move and save it to be the next move
+         This function make the player know what's the another player \
+         move and save it to be the next move
         :param my_move: The player move
         :param their_move: The another player move
         :return:
@@ -92,23 +108,26 @@ class CyclePlayer(Player):
 
 
 class HumanPlayer(Player):
-    @classmethod
-    def move(cls):
+
+    def move(self):
         """
         This function make the HumanPlayer choose the next move
         :return: The next move it's one of ['rock', 'paper', 'scissors']
         """
-        print(f"Please, Enter your next move you should one of {moves}")
-        humanInput = input()
+        humanInput = input(f"{self.player_name}Please,\
+         Enter your next move it should one of {moves} :")
         if humanInput in moves:
+            print(f"{self.player_name} moved")
             return humanInput
         else:
-            print(f"you choose({humanInput}) is not in available chooses, so try a gain.")
-            return cls.move()
+            print(f"you choose({humanInput}) is not in available \
+            chooses, so try a gain.")
+            return self.move()
 
     def learn(self, my_move, their_move):
         """
-         This function make the player know what's the another player move and save it to be the next move
+         This function make the player know what's the another player move \
+          and save it to be the next move
         :param my_move: The player move
         :param their_move: The another player move
         :return:
@@ -118,10 +137,13 @@ class HumanPlayer(Player):
 
 def beats(one, two):
     """
-     beats function it's a judge function to judge between the two players who is win?
+     beats function it's a judge function to judge between \
+     the two players who is win?
     :param one: The move of player one
     :param two: The move of player two
-    :return: return -1 if the player one win else if return 1 if the player two win else return 0 if the round is draw
+    :return: return -1 if the player one win \
+                else if return 1 if the player two win  \
+                else return 0 if the round is draw
     """
     if ((one == 'rock' and two == 'scissors') or
             (one == 'scissors' and two == 'paper') or
@@ -143,6 +165,8 @@ class Game:
         :param p1: player one
         :param p2: player two
         """
+        p1.set_player_name("Player 1: ")
+        p2.set_player_name("Player 2: ")
         self.p1 = p1
         self.p2 = p2
 
@@ -172,6 +196,8 @@ class Game:
             self.number_of_wins_for_playerTwo += 1
         else:
             self.number_of_draw_rounds += 1
+            self.number_of_wins_for_playerOne += 1
+            self.number_of_wins_for_playerTwo += 1
 
     def play_game(self):
         """
@@ -182,17 +208,32 @@ class Game:
         for running_round in range(3):
             print(f"Round {running_round}:")
             self.play_round()
+            self.tell_them_the_score()
         self.announce_the_winner()
         print("Game over!")
 
     def announce_the_winner(self):
         """
-        announcement function to announce who the win the game if there is a winner else announce that the game is
+        announcement function to announce who the win the game\
+         if there is a winner else announce that the game is
         draw. :return:
         """
-        if self.number_of_wins_for_playerOne > self.number_of_wins_for_playerTwo:
+        if self.number_of_wins_for_playerOne \
+                > self.number_of_wins_for_playerTwo:
             print("Oh No, The Winner is player one")
-        elif self.number_of_wins_for_playerOne < self.number_of_wins_for_playerTwo:
+        elif self.number_of_wins_for_playerOne \
+                < self.number_of_wins_for_playerTwo:
             print("Oh No, The Winner is player two")
         else:
             print("Oh No,Draw! no one win")
+
+    def tell_them_the_score(self):
+        """
+         this function just tell the player what's the score now.
+        :return: nothing
+        """
+        print("        Score       ")
+        print(" Player 1 | Player 2")
+        print(f"    {self.number_of_wins_for_playerOne}\
+          {self.number_of_wins_for_playerTwo} ")
+        print("----------------------------------------")
